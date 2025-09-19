@@ -16,7 +16,7 @@ async function bootstrap() {
   );
   app.setGlobalPrefix('api');
   await app.register(multipart as any);
-  const PORT = 8000;
+  const PORT = process.env.PORT || 3000;
   await app.listen(PORT, '0.0.0.0');
   console.log(`Server running on http://localhost:${PORT}`);
 }

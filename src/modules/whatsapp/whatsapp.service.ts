@@ -16,7 +16,7 @@ import { map, Subject } from 'rxjs';
 
 @Injectable()
 export class WhatsappService implements OnApplicationBootstrap {
-  private readonly url = `http://waha:3000`;
+  private readonly url = process.env.WHATSAPP_URL;
   private sessionEvents$ = new Subject<MessageEvent>();
 
   constructor(private readonly httpService: HttpService) {}

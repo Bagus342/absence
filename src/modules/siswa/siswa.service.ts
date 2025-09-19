@@ -37,7 +37,7 @@ export class SiswaService {
         data: { ...data, image, qr_payload },
       });
     } catch (error) {
-      if (image) FileUtil.deleteFile(image);
+      if (image) await FileUtil.deleteFile(image);
       throw error;
     }
   }
@@ -73,7 +73,7 @@ export class SiswaService {
 
     let imagePath: string | null = siswa.image;
     if (file.buffer) {
-      FileUtil.deleteFile(siswa.image);
+      await FileUtil.deleteFile(siswa.image);
       const image = await FileUtil.saveFile(
         file.buffer,
         file.originalname,
@@ -149,6 +149,8 @@ export class SiswaService {
   }
 
   async remove(id: number) {
+    const path = await this.findOne(id);
+    await FileUtil.deleteFile(path.image);
     return await this.prisma.siswa.delete({
       where: {
         id,

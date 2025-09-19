@@ -1,5 +1,6 @@
 import * as XLSX from 'xlsx';
 import * as unzipper from 'unzipper';
+import pLimit from 'p-limit';
 import { BadRequestException } from '@nestjs/common';
 import { ImportSiswaDto } from '../dto/create-siswa.dto';
 import { FileUtil } from 'src/utils/uploadFile.utils';
@@ -28,26 +29,38 @@ export async function extractImagesFromZip(
   zipBuffer: Buffer,
 ): Promise<Record<string, string>> {
   const imageMap: Record<string, string> = {};
+  const limit = pLimit(5);
 
   try {
     const directory = await unzipper.Open.buffer(zipBuffer);
 
-    for (const file of directory.files) {
-      if (file.path.endsWith('/')) continue;
+    const tasks = directory.files
+      .filter((file) => !file.path.endsWith('/'))
+      .map((file) =>
+        limit(async () => {
+          try {
+            const fileName = file.path;
+            const nameWithoutExt = fileName.split('.')[0];
 
-      const fileName = file.path;
-      const nameWithoutExt = fileName.split('.')[0];
+            const chunks: Buffer[] = [];
+            for await (const chunk of file.stream()) {
+              chunks.push(chunk as Buffer);
+            }
 
-      const chunks: Buffer[] = [];
-      for await (const chunk of file.stream()) {
-        chunks.push(chunk as Buffer);
-      }
+            const buffer = Buffer.concat(chunks);
+            const imagePath = await FileUtil.saveFile(
+              buffer,
+              fileName,
+              'siswa',
+            );
+            imageMap[nameWithoutExt] = imagePath;
+          } catch (error) {
+            if (error instanceof Error) console.error(error.message);
+          }
+        }),
+      );
 
-      const buffer = Buffer.concat(chunks);
-      const imagePath = await FileUtil.saveFile(buffer, fileName, 'siswa');
-      imageMap[nameWithoutExt] = imagePath; // simpan nama file asli
-    }
-
+    await Promise.allSettled(tasks);
     return imageMap;
   } catch (error) {
     if (error instanceof Error) {

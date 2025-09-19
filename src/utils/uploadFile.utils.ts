@@ -15,12 +15,12 @@ export class FileUtil {
       fs.mkdirSync(subDir, { recursive: true });
     }
     const compressed = await compressImage(buffer);
-    fs.writeFileSync(`${subDir}/${pathFile}`, compressed);
+    await fs.promises.writeFile(`${subDir}/${pathFile}`, compressed);
     return `${subDir}/${pathFile}`;
   }
 
-  static deleteFile(pathFile: string) {
+  static async deleteFile(pathFile: string) {
     const split = pathFile.split('/');
-    fs.unlinkSync(`${UPLOAD_DIR}/${split[2]}/${split[3]}`);
+    await fs.promises.unlink(`${UPLOAD_DIR}/${split[2]}/${split[3]}`);
   }
 }
