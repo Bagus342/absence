@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+      }
+      .card {
+        width: 85.6mm;
+        height: 54mm;
+        border: 2px solid #000;
+        padding: 5mm;
+        box-sizing: border-box;
+        position: relative;
+        background: #f9f9f9;
+      }
+      .photo {
+        width: 25mm;
+        height: 25mm;
+        object-fit: cover;
+        border: 1px solid #ccc;
+        float: left;
+        margin-left: 2mm;
+      }
+      .info {
+        font-size: 2.5mm;
+        line-height: 1.4;
+      }
+      .qr {
+        position: absolute;
+        bottom: 5mm;
+        right: 5mm;
+        width: 15mm;
+      }
+      h3 {
+        margin: 0 0 5px 0;
+        font-size: 3.5mm;
+      }
+      p {
+        margin: 2px 0;
+      }
+    </style>
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="card">
+      <img class="photo" src="{{image}}" alt="" />
+      <div class="info">
+        <h3><strong>{{name}}</strong></h3>
+        <p><strong>NIS:</strong>{{nis}}</p>
+        <p><strong>Kelas:</strong>{{kelas}}</p>
+      </div>
+      <img class="qr" src="{{qr}}" alt="" />
+    </div>
+  </body>
+</html>

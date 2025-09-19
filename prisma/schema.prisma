@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  username String @unique @db.VarChar(50)
+  password String @db.VarChar(150)
+}
+
+model Siswa {
+  id          Int          @id @default(autoincrement())
+  nis         String       @unique @db.VarChar(100)
+  name        String       @db.VarChar(150)
+  kelas       String       @db.VarChar(50)
+  image       String       @db.VarChar(200)
+  phone       String       @db.VarChar(50)
+  wali        String       @db.VarChar(150)
+  qr_payload  String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  absens      Absen[]
+  permissions Permission[]
+
+  @@index([name])
+  @@index([kelas])
+  @@index([wali])
+  @@index([createdAt])
+}
+
+model Absen {
+  id        Int      @id @default(autoincrement())
+  nis       String
+  activity  String?  @db.VarChar(150)
+  status    Status?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  siswa Siswa @relation(fields: [nis], references: [nis], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([activity])
+  @@index([status])
+}
+
+model Permission {
+  id         Int        @id @default(autoincrement())
+  nis        String
+  image      String
+  keterangan Keterangan
+  status     Boolean    @default(false)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  siswa Siswa @relation(fields: [nis], references: [nis], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([keterangan])
+  @@index([status])
+}
+
+model Libur {
+  id      Int      @id @default(autoincrement())
+  tanggal DateTime
+
+  @@index([tanggal])
+}
+
+enum Keterangan {
+  IZIN
+  SAKIT
+}
+
+enum Status {
+  ONTIME
+  LATE
+  PERMISSION
+}
