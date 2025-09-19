@@ -21,6 +21,8 @@ WAHA_BASE_URL=http://localhost:3000
 SERVER_SECRET=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 SALT='3znlf:D)-tjX'
 
+WHATSAPP_URL=http://localhost:3000
+
 # Server configuration (if you need to customize hostname/port)
 # WHATSAPP_API_SCHEMA=http
 WHATSAPP_API_PORT=3000
