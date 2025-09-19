@@ -1,14 +1,10 @@
-## Description
+# Description
 
 Server side dari aplikasi absen. Menggunakan bahasa TypeScript, Framework NestJS dan http Fastify.
 
-## Project setup
+# Project setup
 
-```bash
-$ npm install
-```
-
-#### Setup env file
+## Setup env file
 
 ```
 POSTGRES_USER=user
