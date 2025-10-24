@@ -2,19 +2,21 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateSiswaDto, ImportSiswaDto } from './dto/create-siswa.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UploadDto } from './dto/upload.dto';
 import { extractImagesFromZip, parseXlsx } from './helpers/file-import.helper';
 import { UpdateSiswaDto } from './dto/update-siswa.dto';
-import { FileUtil } from 'src/utils/uploadFile.utils';
-import { buildPagination } from '../../utils/build-pagination.utils';
+import { FileUtil } from 'src/utils/file.util';
+import { buildPagination } from '../../utils/pagination.util';
 import { QueryDto } from './dto/query.dto';
 import { whereBuild } from './helpers/where-builder.helper';
 import { PaginationMeta } from 'src/common/interfaces/pagination.interface';
 import { QrService } from 'src/qr/qr.service';
 import { CardService } from 'src/card/card.service';
+import { archiveHelper } from './helpers/archive.helper';
 
 @Injectable()
 export class SiswaService {
@@ -141,6 +143,28 @@ export class SiswaService {
         throw new BadRequestException('Import failed: ' + error.message);
       }
     }
+  }
+
+  async archiveSiswa(kelas: string) {
+    const data = await this.prisma.siswa.findMany({
+      where: { kelas },
+    });
+
+    if (data.length === 0) {
+      throw new NotFoundException(`Tidak ada siswa kelas ${kelas}`);
+    }
+
+    await this.prisma.siswa.deleteMany({ where: { kelas } });
+
+    for (const v of data) {
+      await FileUtil.deleteFile(v.image);
+    }
+
+    return archiveHelper(
+      `Arsip Kelas ${kelas}`,
+      ['NIS', 'Name', 'Kelas', 'Nomor Telepon', 'Wali'],
+      data,
+    );
   }
 
   async cardDownload(id: number) {

@@ -9,6 +9,7 @@ import { SiswaModule } from './modules/siswa/siswa.module';
 import { AbsenModule } from './modules/absen/absen.module';
 import { PermissionModule } from './modules/permission/permission.module';
 import { LiburModule } from './modules/libur/libur.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { LiburModule } from './modules/libur/libur.module';
     AbsenModule,
     PermissionModule,
     LiburModule,
+    ScheduleModule.forRoot(),
   ],
   providers: [
     {

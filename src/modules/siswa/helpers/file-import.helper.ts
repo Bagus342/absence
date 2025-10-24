@@ -3,7 +3,7 @@ import * as unzipper from 'unzipper';
 import pLimit from 'p-limit';
 import { BadRequestException } from '@nestjs/common';
 import { ImportSiswaDto } from '../dto/create-siswa.dto';
-import { FileUtil } from 'src/utils/uploadFile.utils';
+import { FileUtil } from 'src/utils/file.util';
 import { QrService } from 'src/qr/qr.service';
 
 export function parseXlsx(buffer: Buffer): ImportSiswaDto[] {

@@ -21,7 +21,7 @@ const querySchema = z.object({
     .default(5),
   nis: z.string().optional(),
   keterangan: z.enum(['IZIN', 'SAKIT']).optional(),
-  status: z.boolean().optional(),
+  status: z.enum(['WAITING', 'APPROVE', 'REJECT']).optional(),
   date: z.date().optional(),
 });
 

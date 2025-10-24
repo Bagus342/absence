@@ -40,12 +40,13 @@ model Siswa {
 }
 
 model Absen {
-  id        Int      @id @default(autoincrement())
+  id        Int          @id @default(autoincrement())
   nis       String
-  activity  String?  @db.VarChar(150)
-  status    Status?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  activity  String?      @db.VarChar(150)
+  status    StatusAbsen?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  permission Permission?
 
   siswa Siswa @relation(fields: [nis], references: [nis], onUpdate: Cascade, onDelete: Cascade)
 
@@ -55,15 +56,17 @@ model Absen {
 }
 
 model Permission {
-  id         Int        @id @default(autoincrement())
+  id         Int              @id @default(autoincrement())
+  absenId    Int  @unique
   nis        String
   image      String
   keterangan Keterangan
-  status     Boolean    @default(false)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  status     StatusPermission
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
 
   siswa Siswa @relation(fields: [nis], references: [nis], onUpdate: Cascade, onDelete: Cascade)
+  absen Absen @relation(fields: [absenId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 
   @@index([createdAt])
   @@index([keterangan])
@@ -77,12 +80,18 @@ model Libur {
   @@index([tanggal])
 }
 
+enum StatusPermission {
+  WAITING
+  APPROVE
+  REJECT
+}
+
 enum Keterangan {
   IZIN
   SAKIT
 }
 
-enum Status {
+enum StatusAbsen {
   ONTIME
   LATE
   PERMISSION

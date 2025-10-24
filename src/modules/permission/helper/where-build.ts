@@ -8,7 +8,9 @@ export const whereBuildPermission = (query: QueryPermissionDto) => {
 
   if (query.keterangan) where.keterangan = query.keterangan;
 
-  if (query.status) where.status = query.status;
+  if (query.status) {
+    where.status = query.status;
+  }
 
   if (query.date) {
     where.createdAt = {};

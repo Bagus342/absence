@@ -13,6 +13,7 @@ import {
   WebhookRequest,
 } from './whatsapp.interface';
 import { map, Subject } from 'rxjs';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class WhatsappService implements OnApplicationBootstrap {
@@ -61,11 +62,13 @@ export class WhatsappService implements OnApplicationBootstrap {
     return data;
   }
 
+  @Cron('* 59 23 * * *')
   async restartSession() {
     await this.httpService.axiosRef.post(
       `${this.url}/api/sessions/default/restart`,
     );
   }
+
   async getQr() {
     const session = await this.getSession();
     if (session.status === SessionStatus.WORKING) {
@@ -85,10 +88,13 @@ export class WhatsappService implements OnApplicationBootstrap {
   }
 
   async sendNotification(absen: AbsenWithPrisma) {
-    await this.httpService.axiosRef.post(`${this.url}/api/sendText`, {
-      chatId: `62${absen.siswa.phone}@c.us`,
-      text: `*NOTIFIKASI ABSEN*\n \n Nama : ${absen.siswa.name} \n ${absen.status == 'PERMISSION' ? 'Izin' : 'Kehadiran'} : ${absen.activity} \n ${absen.status == 'PERMISSION' ? '' : 'Status :'} ${absen.status == 'ONTIME' ? 'Tepat waktu' : absen.status == 'PERMISSION' ? '' : 'Terlambat'} \n ${absen.createdAt.toLocaleDateString()}`,
-      session: 'default',
-    });
+    const session = await this.getSession();
+    if (session.status === SessionStatus.WORKING) {
+      await this.httpService.axiosRef.post(`${this.url}/api/sendText`, {
+        chatId: `62${absen.siswa.phone}@c.us`,
+        text: `*NOTIFIKASI ABSEN*\n \n Nama : ${absen.siswa.name} \n ${absen.status == 'PERMISSION' ? 'Izin' : 'Kehadiran'} : ${absen.activity} \n ${absen.status == 'PERMISSION' ? '' : 'Status :'} ${absen.status == 'ONTIME' ? 'Tepat waktu' : absen.status == 'PERMISSION' ? '' : 'Terlambat'} \n ${absen.createdAt.toLocaleDateString()}`,
+        session: 'default',
+      });
+    }
   }
 }

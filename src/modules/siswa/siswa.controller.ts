@@ -12,6 +12,7 @@ import {
   ParseIntPipe,
   UploadedFile,
   Query,
+  Res,
 } from '@nestjs/common';
 import { SiswaService } from './siswa.service';
 import { CreateSiswaDto } from './dto/create-siswa.dto';
@@ -27,6 +28,8 @@ import { FileValidationPipe } from 'src/common/pipes/file-validation.pipe';
 import { QueryDto } from './dto/query.dto';
 import { PaginatedResponse } from 'src/common/interfaces/pagination.interface';
 import { Siswa } from '@prisma/client';
+import { ArchiveDto } from './dto/archive.dto';
+import type { FastifyReply } from 'fastify';
 
 @Controller('siswa')
 export class SiswaController {
@@ -79,9 +82,16 @@ export class SiswaController {
     return this.siswaService.update(id, file, body);
   }
 
-  @Get(':id/image')
-  download(@Param('id', ParseIntPipe) id: number) {
-    return this.siswaService.cardDownload(id);
+  @UseGuards(AuthGuard)
+  @Post('archive')
+  async archive(@Body() body: ArchiveDto, @Res() res: FastifyReply) {
+    const buffer = await this.siswaService.archiveSiswa(body.kelas);
+
+    res.header(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.send(buffer);
   }
 
   @UseGuards(AuthGuard)

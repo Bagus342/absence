@@ -10,12 +10,12 @@ const absenSchema = z.object({
 
 const filterSchema = z.object({
   page: z
-    .number()
+    .string()
     .optional()
     .transform((val) => Number(val))
     .default(1),
   limit: z
-    .number()
+    .string()
     .optional()
     .transform((val) => Number(val))
     .default(5),
@@ -24,8 +24,18 @@ const filterSchema = z.object({
   date: z.date().optional(),
 });
 
+const archiveSchema = z
+  .object({
+    month: z
+      .string()
+      .nonempty('Bulan tidak boleh kosong')
+      .transform((v) => Number(v)),
+  })
+  .strict();
+
 export class AbsenDto extends createZodDto(absenSchema) {}
 export class QueryDto extends createZodDto(filterSchema) {}
+export class ArchiveDto extends createZodDto(archiveSchema) {}
 
 export type AbsenWithPrisma = Prisma.AbsenGetPayload<{
   include: { siswa: true };

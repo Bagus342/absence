@@ -7,7 +7,6 @@ export interface ResponseSession {
 }
 
 export interface QrCodeResponse {
-  mimetype: string;
   data: string;
 }
 

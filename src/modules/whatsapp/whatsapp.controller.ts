@@ -26,8 +26,8 @@ export class WhatsAppController {
   }
 
   @UseGuards(AuthGuard)
-  @Get('qr')
-  qrCode() {
+  @Post('qr')
+  pairingCode() {
     return this.whatsappService.getQr();
   }
 }

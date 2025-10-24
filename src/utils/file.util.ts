@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { compressImage } from 'src/utils/compress-image.utils';
+import { compressImage } from 'src/utils/compress.util';
 
 const UPLOAD_DIR = path.join(process.cwd(), 'uploads');
 
@@ -20,7 +20,7 @@ export class FileUtil {
   }
 
   static async deleteFile(pathFile: string) {
-    const split = pathFile.split('/');
-    await fs.promises.unlink(`${UPLOAD_DIR}/${split[2]}/${split[3]}`);
+    // const split = pathFile.split('/');
+    await fs.promises.unlink(pathFile);
   }
 }
