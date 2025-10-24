@@ -28,7 +28,7 @@ WHATSAPP_URL=http://localhost:3000
 WHATSAPP_API_PORT=3000
 WHATSAPP_API_HOSTNAME=0.0.0.0
 
-WHATSAPP_HOOK_URL=http://host.docker.internal:8000/api/whatsapp/webhook
+WHATSAPP_HOOK_URL=http://localhost:3000/api/whatsapp/webhook
 WHATSAPP_HOOK_EVENTS=session.status
 
 # ====================
