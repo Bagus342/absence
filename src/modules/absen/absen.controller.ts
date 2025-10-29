@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AbsenService } from './absen.service';
-import { AbsenDto, ArchiveDto, QueryDto } from './dto/absen.dto';
+import { ArchiveDto, CreateDto, QueryDto } from './dto/absen.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { PaginatedResponse } from 'src/common/interfaces/pagination.interface';
 import { Absen } from '@prisma/client';
@@ -69,7 +69,7 @@ export class AbsenController {
   }
 
   @Post()
-  createAbsen(@Body() checkInDto: AbsenDto) {
+  createAbsen(@Body() checkInDto: CreateDto) {
     return this.absenService.attendace(checkInDto);
   }
 }

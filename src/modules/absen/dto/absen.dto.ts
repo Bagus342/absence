@@ -2,8 +2,14 @@ import { Prisma } from '@prisma/client';
 import { createZodDto } from 'nestjs-zod';
 import * as z from 'zod';
 
-const absenSchema = z.object({
+const createSchema = z.object({
   nis: z.string().nonempty('Nis tidak boleh kosong'),
+  activity: z.string().optional(),
+  status: z.enum(['ONTIME', 'LATE', 'PERMISSION']).optional(),
+});
+
+const attendanceSchema = z.object({
+  rfid: z.string().nonempty('Rfid tidak boleh kosong'),
   activity: z.string().optional(),
   status: z.enum(['ONTIME', 'LATE', 'PERMISSION']).optional(),
 });
@@ -33,7 +39,8 @@ const archiveSchema = z
   })
   .strict();
 
-export class AbsenDto extends createZodDto(absenSchema) {}
+export class CreateDto extends createZodDto(createSchema) {}
+export class AttendanceDto extends createZodDto(attendanceSchema) {}
 export class QueryDto extends createZodDto(filterSchema) {}
 export class ArchiveDto extends createZodDto(archiveSchema) {}
 

@@ -4,6 +4,7 @@ import { z } from 'zod';
 export const CreateSiswaSchema = z
   .object({
     nis: z.string().nonempty('Nis tidak boleh kosong'),
+    rfid: z.string().nonempty('RFID tidak boleh kosong'),
     name: z.string().nonempty('Nama tidak boleh kosong'),
     phone: z.string().min(6, 'Nomor Telepon minimal 6 karakter'),
     wali: z.string().nonempty('Wali Murid tidak boleh kosong'),
@@ -14,6 +15,7 @@ export const CreateSiswaSchema = z
 export const ImportSiswaSchema = z
   .object({
     nis: z.string().nonempty('Nis tidak boleh kosong'),
+    rfid: z.string().nonempty('RFID tidak boleh kosong'),
     name: z.string().nonempty('Nama tidak boleh kosong'),
     image: z.string().nonempty('Image tidak boleh kosong'),
     phone: z.string().min(6, 'Nomor Telepon minimal 6 karakter'),

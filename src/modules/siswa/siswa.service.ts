@@ -27,7 +27,16 @@ export class SiswaService {
   ) {}
 
   async create(file: Express.Multer.File, data: CreateSiswaDto) {
-    await this.checkUnique(data.nis);
+    const nis = await this.checkNis(data.nis);
+    const rfid = await this.checkRfid(data.rfid);
+
+    if (nis) {
+      throw new BadRequestException('Nis telah terdaftar');
+    }
+
+    if (rfid) {
+      throw new BadRequestException('Rfid telah terdaftar');
+    }
 
     let image: string | null = null;
     try {
@@ -73,6 +82,17 @@ export class SiswaService {
       throw new BadRequestException('Siswa tidak terdaftar');
     }
 
+    const nis = await this.checkNis(updateDto.nis!);
+    const rfid = await this.checkRfid(updateDto.rfid!);
+
+    if (nis && nis.id !== id) {
+      throw new ConflictException('Nis telah terdaftar');
+    }
+
+    if (rfid && rfid.id !== id) {
+      throw new ConflictException('Rfid telah terdaftar');
+    }
+
     let imagePath: string | null = siswa.image;
     if (file.buffer) {
       await FileUtil.deleteFile(siswa.image);
@@ -103,16 +123,22 @@ export class SiswaService {
     return siswa;
   }
 
-  async checkUnique(nis: string) {
+  async checkRfid(rfid: string) {
+    const siswa = await this.prisma.siswa.findUnique({
+      where: {
+        rfid,
+      },
+    });
+
+    return siswa;
+  }
+
+  async checkNis(nis: string) {
     const siswa = await this.prisma.siswa.findUnique({
       where: {
         nis,
       },
     });
-
-    if (siswa) {
-      throw new ConflictException('Nis telah terdaftar');
-    }
 
     return siswa;
   }
@@ -133,6 +159,7 @@ export class SiswaService {
       const result: ImportSiswaDto[] = data.map((row) => ({
         ...row,
         nis: String(row.nis),
+        rfid: String(row.rfid),
         phone: String(row.phone),
         image: imageMap[row.nis] ? imageMap[row.nis] : '',
       }));
@@ -162,7 +189,7 @@ export class SiswaService {
 
     return archiveHelper(
       `Arsip Kelas ${kelas}`,
-      ['NIS', 'Name', 'Kelas', 'Nomor Telepon', 'Wali'],
+      ['NIS', 'Rfid', 'Name', 'Kelas', 'Nomor Telepon', 'Wali'],
       data,
     );
   }

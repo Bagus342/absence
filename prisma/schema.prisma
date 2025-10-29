@@ -21,6 +21,7 @@ model User {
 
 model Siswa {
   id          Int          @id @default(autoincrement())
+  rfid        String       @unique @db.VarChar(100)
   nis         String       @unique @db.VarChar(100)
   name        String       @db.VarChar(150)
   kelas       String       @db.VarChar(50)
@@ -40,12 +41,12 @@ model Siswa {
 }
 
 model Absen {
-  id        Int          @id @default(autoincrement())
-  nis       String
-  activity  String?      @db.VarChar(150)
-  status    StatusAbsen?
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  id         Int          @id @default(autoincrement())
+  nis        String
+  activity   String?      @db.VarChar(150)
+  status     StatusAbsen?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
   permission Permission?
 
   siswa Siswa @relation(fields: [nis], references: [nis], onUpdate: Cascade, onDelete: Cascade)
@@ -57,7 +58,7 @@ model Absen {
 
 model Permission {
   id         Int              @id @default(autoincrement())
-  absenId    Int  @unique
+  absenId    Int              @unique
   nis        String
   image      String
   keterangan Keterangan

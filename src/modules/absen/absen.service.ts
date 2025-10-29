@@ -6,7 +6,12 @@ import {
 } from '@nestjs/common';
 import { AblyService } from 'src/ably/ably.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AbsenDto, AbsenWithPrisma, QueryDto } from './dto/absen.dto';
+import {
+  AbsenWithPrisma,
+  AttendanceDto,
+  CreateDto,
+  QueryDto,
+} from './dto/absen.dto';
 import { DateTime } from 'luxon';
 import { WhatsappService } from 'src/modules/whatsapp/whatsapp.service';
 import { whereBuildAbsen } from './helper/where-build.helper';
@@ -58,10 +63,10 @@ export class AbsenService {
     return this.prismaService.absen.findMany({ where: { nis: siswa.nis } });
   }
 
-  async findByNis(nis: string) {
+  async findByRfid(rfid: string) {
     const siswa = await this.prismaService.siswa.findUnique({
       where: {
-        nis,
+        rfid,
       },
     });
 
@@ -83,13 +88,13 @@ export class AbsenService {
     }
   }
 
-  async findCheckIn(absen: AbsenDto) {
+  async findCheckIn(nis: string) {
     const gte = this.dateTimeNow.startOf('day').toJSDate();
     const lte = this.dateTimeNow.endOf('day').toJSDate();
 
     const latest = await this.prismaService.absen.findFirst({
       where: {
-        nis: absen.nis,
+        nis,
         activity: 'Masuk',
         createdAt: { gte, lte },
       },
@@ -102,7 +107,7 @@ export class AbsenService {
     }
   }
 
-  async checkInStatus(absen: AbsenDto) {
+  async checkInStatus(absen: CreateDto) {
     const hour = this.dateTimeNow.hour;
     const minute = this.dateTimeNow.minute;
 
@@ -127,13 +132,13 @@ export class AbsenService {
     return data;
   }
 
-  async findCheckOut(absen: AbsenDto) {
+  async findCheckOut(nis: string) {
     const gte = this.dateTimeNow.startOf('day').toJSDate();
     const lte = this.dateTimeNow.endOf('day').toJSDate();
 
     const latest = await this.prismaService.absen.findFirst({
       where: {
-        nis: absen.nis,
+        nis,
         activity: 'Pulang',
         createdAt: { gte, lte },
       },
@@ -146,7 +151,7 @@ export class AbsenService {
     }
   }
 
-  async checkOutStatus(absen: AbsenDto) {
+  async checkOutStatus(absen: CreateDto) {
     const hour = this.dateTimeNow.hour;
     const minute = this.dateTimeNow.minute;
 
@@ -172,30 +177,34 @@ export class AbsenService {
     return data;
   }
 
-  async createAbsen(absen: AbsenDto) {
+  async createAbsen(absen: CreateDto) {
     return await this.prismaService.absen.create({
       data: absen,
       include: { siswa: true },
     });
   }
 
-  async attendace(checkInDto: AbsenDto) {
-    await this.findByNis(checkInDto.nis);
+  async attendace(checkInDto: AttendanceDto) {
+    const nis = await this.findByRfid(checkInDto.rfid);
+
     await this.checkLibur();
+    const { rfid, ...itemWithoutRfid } = checkInDto;
+
+    const payload: CreateDto = { nis: nis.nis, ...itemWithoutRfid };
     const hour = this.dateTimeNow.hour;
     if (hour < 7) {
       throw new BadRequestException('Harap melakukan absen pada jam 7');
     }
 
     if (hour > 15) {
-      await this.findCheckOut(checkInDto);
-      const data = await this.checkOutStatus(checkInDto);
+      await this.findCheckOut(nis.nis);
+      const data = await this.checkOutStatus(payload);
       await this.whatsAppService.sendNotification(data);
       return data;
     }
 
-    await this.findCheckIn(checkInDto);
-    const data = await this.checkInStatus(checkInDto);
+    await this.findCheckIn(nis.nis);
+    const data = await this.checkInStatus(payload);
     await this.whatsAppService.sendNotification(data);
     return data;
   }
